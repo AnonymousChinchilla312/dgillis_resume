@@ -1,0 +1,329 @@
+---
+title: "Happiness City Index"
+author: "Daniel Gillis"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+execute: 
+  warning: false
+    
+---
+```{python}
+import pandas as pd
+import plotly_express as px
+
+# Get data for the project
+data_path = "archive/train.csv"
+city_data = pd.read_csv(data_path)
+df = city_data[city_data['Year'] == 2024].drop_duplicates('City', keep='last')
+```
+<!-- ---IDEA GENERATION CHARTS START--- -->
+<!-- ```{python}
+# Cities over Happiness
+chart = (px.bar(
+    df.query('Year <= 2024')
+    .sort_values(['Happiness_Score']),
+    x='City',
+    y='Happiness_Score',
+    color='City',
+    title='Cities over happiness')
+)
+
+chart.show()
+```
+```{python}
+# Decibel Level over Happiness
+chart = (px.scatter(
+    df.query('Year <= 2024'),
+    x='Decibel_Level',
+    y='Happiness_Score',
+    color='City',
+    title='Decibel Level over Happiness')
+)
+
+chart.show()
+```
+```{python}
+# Traffic Density over Happiness
+chart = (px.scatter(
+    df.query('Year <= 2024'),
+    x='Traffic_Density',
+    y='Happiness_Score',
+    color='City',
+    title='Traffic Density over Happiness')
+)
+
+chart.show()
+```
+```{python}
+# Green Space over Happiness
+chart = (px.scatter(
+    df.query('Year <= 2024'),
+    x='Green_Space_Area',
+    y='Happiness_Score',
+    color='City',
+    title='Green Space over Happiness')
+)
+
+chart.show()
+```
+
+<!-- There seems to be a negative correlation between air quality and happiness. Good air quality probably doesn't cause unhappiness, but there might be some other factor not shown, like high amounts of polluting industries that increase quality of life. -->
+<!-- ```{python}
+# Air Quality over Happiness
+chart = (px.scatter(
+    df.query('Year <= 2024'),
+    x='Air_Quality_Index',
+    y='Happiness_Score',
+    color='City',
+    title='Air Quality over Happiness')
+)
+
+chart.show()
+```
+```{python}
+# Cost of Living over Happiness
+chart = (px.scatter(
+    df.query('Year <= 2024'),
+    x='Cost_of_Living_Index',
+    y='Happiness_Score',
+    color='City',
+    title='Cost of Living over Happiness')
+)
+
+chart.show()
+```
+```{python}
+# Healthcare over Happiness
+chart = (px.scatter(
+    df.query('Year <= 2024'),
+    x='Healthcare_Index',
+    y='Happiness_Score',
+    color='City',
+    title='Healthcare over Happiness')
+)
+
+chart.show()
+```
+<!-- ---IDEA GENERATION CHARTS END--- -->
+## What Makes a City Happy?
+To answer this question, we will look at a [city happiness index by Emirhan Bulut](https://www.kaggle.com/datasets/emirhanai/city-happiness-index-2024), which includes information such as air quality, cost of living, and amount of green space in a city. The data used in this webpage is specifically pulling data from the latest available date in 2024. The dataset includes predictions for future years, but these are not included in this page's data.
+
+[Click here](#data-description) for a description of the data used on this page.
+
+## Question 1
+
+* What does a general analysis of the factors related to a city's happiness tell us?
+
+When looking at the differing factors that could play a role in a city's happiness, one of the most direct correlations is quality of healthcare. This graph suggests that affordable healthcare services plays a large role in people's mental wellbeing.
+```{python}
+# Healthcare over Happiness
+chart = (px.scatter(
+    df,
+    x='Healthcare_Index',
+    y='Happiness_Score',
+    title='Healthcare Quality over Happiness Score',
+    hover_data='City')
+)
+
+chart.show()
+```
+There is also a correlation between happiness scores and low levels of noise in a city. This makes sense, who would want to live in a city where there is constant honking and loud traffic?
+```{python}
+# Decibel Level over Happiness
+chart = (px.scatter(
+    df,
+    x='Decibel_Level',
+    y='Happiness_Score',
+    title='Noise Level over Happiness Score',
+    hover_data='City')
+)
+
+chart.show()
+```
+The percentage of green spaces within a city also correlate to happiness... up to a point. Though cities with an average amount of green space do better than those with little green space, they also do better than cities with lots of green space. One possible explanation is that these cities with many green spaces have an underlying factor like lack of infrastructure that is causing both green space and unhappiness.
+```{python}
+# Green Space Area over Happiness
+chart = (px.scatter(
+    df,
+    x='Green_Space_Area',
+    y='Happiness_Score',
+    title='Green Space Area over Happiness Score',
+    hover_data='City')
+)
+
+chart.show()
+```
+An interesting finding in the next chart is that air quality is inversely correlated with happiness. Perhaps this is due to highly-polluting factories that produce useful goods, making people happier.
+```{python}
+# Air Quality over Happiness Score
+chart = (px.scatter(
+    df,
+    x='Air_Quality_Index',
+    y='Happiness_Score',
+    title='Air Quality over Happiness Score',
+    hover_data='City')
+)
+
+chart.show()
+```
+Observing what is *not* correlated to happiness is just as important as looking at what is correlated. A surprising finding is that there is no strong correlation between Cost of Living and Happiness Scores. Happy cities with both high and low cost of living are found in this dataset.
+```{python}
+# Cost of Living over Happiness Score
+chart = (px.scatter(
+    df,
+    x='Cost_of_Living_Index',
+    y='Happiness_Score',
+    title='Cost of Living over Happiness Score',
+    hover_data='City')
+)
+
+chart.show()
+```
+These findings give us a basic understanding of the variables at work in this dataset.
+
+## Question 2
+
+* What are the most significant factors affecting a city's overall happiness?
+
+Based on the current findings, quality of healthcare seems to be the most important variable when considering a city's overall happiness. Let's take a look at the healthcare graph again...
+```{python}
+# Healthcare over Happiness
+chart = (px.scatter(
+    df,
+    x='Healthcare_Index',
+    y='Happiness_Score',
+    title='Healthcare Quality over Happiness Score',
+    hover_data='City')
+)
+
+chart.show()
+```
+As we can see, some cities seem to have high healthcare scores, but are relatively unhappy. Let's give these cities a distinct color to keep track of them:
+```{python}
+# Assign distinct variable to distinguish outlying cities.
+df['Healthcare_Outlier'] = ((df['Healthcare_Index'] >= 90) & (df['Happiness_Score'] < 6.5))
+
+# Healthcare over Happiness
+chart = (px.scatter(
+    df,
+    x='Healthcare_Index',
+    y='Happiness_Score',
+    title='Healthcare Quality over Happiness Score',
+    hover_data='City',
+    color='Healthcare_Outlier')
+)
+
+chart.show()
+```
+Do any of the other variables offer a possible explanation? As it turns out, the graph of green space in a city we saw before hints at a possible answer.
+
+```{python}
+# Green Space Area over Happiness w/ outliers
+chart = (px.scatter(
+    df,
+    x='Green_Space_Area',
+    y='Happiness_Score',
+    title='Green Space Area over Happiness',
+    hover_data='City',
+    color='Healthcare_Outlier')
+)
+
+chart.show()
+```
+Most of these outliers are on the "too much green" end of the spectrum. Earlier, we had hypothesized these cities are lacking infrastructure that citizens depend on. This is a possible reason why their happiness scores are so low.
+
+Taking this into account, we can create a chart that shows the impact of both healthcare and green space. The happiest cities share two qualities: high-end healthcare and sitting in a kind of 'goldilocks zone' of green space--not too much, not too little.
+```{python}
+# Green Space Area over Healthcare and Happiness
+chart = (px.scatter(
+    df,
+    x='Green_Space_Area',
+    y='Healthcare_Index',
+    title='Healthcare and Green Space both affect Happiness',
+    hover_data='City',
+    color='Happiness_Score')
+)
+
+chart.show()
+```
+Now we have a better theory of what makes a city happy: Quality healthcare with sufficient urban areas to support its citizens. Cities that acheive this are showing high levels of happiness.
+
+Let's take a look at a variable we considered earlier: Noise Level. There is an inverse correlation between a city's happiness score and noise level, as shown below:
+
+```{python}
+# Decibel Level over Happiness
+chart = (px.scatter(
+    df,
+    x='Decibel_Level',
+    y='Happiness_Score',
+    title='Noise Level over Happiness Score',
+    hover_data='City')
+)
+
+chart.show()
+```
+If we add the Healthcare Index as a variable, we see an unsurprising trend. Cities that are both Healthy and quiet are happier (except for the unhappy outliers we examined previously).
+
+```{python}
+# Decibel Level over Healthcare
+chart = (px.scatter(
+    df,
+    x='Decibel_Level',
+    y='Healthcare_Index',
+    title='Healthcare Quality and Noise Level over Happiness Score',
+    hover_data='City',
+    color='Happiness_Score')
+)
+
+chart.show()
+```
+Now we can refine our theory to include three general factors that contribute to cities' happiness:
+
+* High quality of healthcare.
+
+* Middling green space area.
+
+* Low noise level.
+
+Where these three conditions are present, the happiness score is likely to be maximized.
+
+## Data Description
+Below are the descriptions of the variables provided in this dataset. The dataset can be found at: https://www.kaggle.com/datasets/emirhanai/city-happiness-index-2024
+
+City: Name of the city.
+
+Month: The month in which the data is recorded.
+
+Year: The year in which the data is recorded. (For the purposes of this analysis, we will only be looking at the year 2024.)
+
+Decibel_Level: Average noise levels in decibels, indicating the auditory comfort of the citizens.
+
+Traffic_Density: Level of traffic density (Low, Medium, High, Very High), which might impact citizens' daily commute and stress levels.
+
+Green_Space_Area: Percentage of green spaces in the city, positively contributing to the mental well-being and relaxation of the inhabitants.
+
+Air_Quality_Index: Index measuring the quality of air, a crucial aspect affecting citizens' health and overall satisfaction.
+
+Happiness_Score: The average happiness score of the city (on a 1-10 scale), representing the subjective well-being of the population.
+
+Cost_of_Living_Index: Index measuring the cost of living in the city (relative to a reference city), which could impact the financial satisfaction of the citizens.
+
+Healthcare_Index: Index measuring the quality of healthcare in the city, an essential component of the population's well-being and contentment.
+
+[Back to Introduction](#what-makes-a-city-happy)
